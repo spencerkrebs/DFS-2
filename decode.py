@@ -1,18 +1,38 @@
+# O(n*k) time and space where k is the max repeat count and n is size of string
 class Solution:
     def decodeString(self, s: str) -> str:
-        stack = []
+        numSt = []
+        strSt = []
+        currNum = 0
+        currStr = []
 
         for i in range(len(s)):
-            if s[i] != "]":
-                stack.append(s[i])
+            c = s[i]
+            
+            if c.isdigit():
+                currNum = currNum * 10 + int(c)
+            elif c == '[':
+                # Push the current state to stacks to handle nesting
+                strSt.append(currStr)
+                numSt.append(currNum)
+                
+                
+                currNum = 0
+                currStr = []
+            elif c == ']':
+                cnt = numSt.pop()
+                parent = strSt.pop()
+                
+                for k in range(cnt):
+                    parent.extend(currStr)
+                
+                currStr = parent
             else:
-                substr = ""
-                while stack[-1] != "[":
-                    substr = stack.pop() + substr 
-                stack.pop()
-                k=""
-                while stack and stack[-1].isdigit():
-                    k = stack.pop() + k
-                stack.append(int(k)*substr)
-        
-        return "".join(stack)
+                currStr.append(c)
+                
+        final_result = ''.join(currStr)
+        return final_result
+
+# Example run:
+# sol = Solution()
+# sol.decodeString("3[a2[c]]")
